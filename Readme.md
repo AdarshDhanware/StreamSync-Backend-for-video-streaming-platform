@@ -1,7 +1,9 @@
 
-# 📺 StreamSync – Backend for Video Streaming Platform	
+# 📺 StreamSync – Backend for Video Streaming Platform
 
-StreamSync is a backend for a YouTube-like platform built with Node.js, Express.js, and MongoDB. It features JWT-based authentication, Cloudinary video uploads, subscriptions, comments, likes/dislikes, playlists, and aggregation pipelines. Designed with MVC architecture and Swagger docs, it ensures scalability, modularity, and production-readiness for real-world applications.
+StreamSync is a backend for a **video streaming platform** built with **Node.js, Express.js, and MongoDB**.  
+It features JWT-based authentication, Cloudinary video uploads, subscriptions, comments, likes/dislikes, playlists, and aggregation pipelines.  
+Designed with **MVC architecture, Swagger documentation, and Docker support**, it ensures scalability, modularity, and production-readiness for real-world applications.
 
 ---
 
@@ -11,53 +13,52 @@ All API endpoints for **StreamSync** are documented using **Swagger (OpenAPI)** 
 
 > You can explore the API via the interactive Swagger UI.
 
-**🔗 Live Swagger Docs**:[View API Documentation](https://streamsync-2rv0.onrender.com/api-docs/)  
+**🔗 Live Swagger Docs**: [View API Documentation](https://streamsync-1-imhr.onrender.com/api-docs)  
 
 ---
 
 ## 🚀 Features Implemented
 
-The StreamSync backend powers all core operations such as:
+The StreamSync backend powers core operations such as:
 
-- Secure user auth with JWT & cookies
-- Video upload with Multer + Cloudinary
-- CRUD for videos, playlists, comments
-- Subscriptions, likes/dislikes per user
-- Pagination using aggregate-paginate
-- Rich data via MongoDB aggregation pipelines
-- Utility-based architecture for cleaner code
-- Environment-driven config for scalability
+- Secure user authentication with JWT & HTTP-only cookies  
+- Video uploads using **Multer + Cloudinary**  
+- CRUD operations for videos, playlists, and comments  
+- User subscriptions, likes, and dislikes  
+- Pagination using `mongoose-aggregate-paginate-v2`  
+- Rich data using MongoDB aggregation pipelines  
+- Utility-based architecture for cleaner, reusable code  
+- Environment-driven configuration for scalability  
+- Containerized with Docker for easy setup and deployment  
 
-Designed with **clean code practices**, this backend is structured for **scalability**, **reliability**, and **extensibility**, supporting future enhancements like monetization, or live streaming integration.
+Designed for scalability, reliability, and extensibility, supporting future enhancements like monetization or live streaming integration.
 
 ---
 
 ## 🧱 Tech Stack
 
-- **Node.js + Express.js** – Backend runtime and web framework  
+- **Node.js + Express.js** – Backend runtime & web framework  
 - **MongoDB + Mongoose** – NoSQL database with schema modeling  
-- **Aggregation Pipelines** – For complex relational-like queries across collections  
+- **Aggregation Pipelines** – Complex relational-like queries across collections  
 - **mongoose-aggregate-paginate-v2** – Efficient pagination  
 - **JWT + HTTP-only Cookies** – Secure authentication  
 - **bcrypt** – Password hashing  
-- **Multer + Cloudinary** – File uploads and cloud storage  
+- **Multer + Cloudinary** – File uploads & cloud storage  
 - **cors** – Cross-origin request handling  
 - **dotenv** – Environment variable management  
-- **Prettier** – Code formatting for consistency  
-- **Swagger + swagger-autogen** – Auto-generated API documentation
+- **Prettier** – Code formatting  
+- **Swagger + swagger-autogen** – Auto-generated API docs  
+- **Docker** – Containerization for consistent deployment  
 
 ---
 
 ## ✨ Core Highlights
-- 🔄 Utility-Driven Architecture: Common logic is abstracted into utility classes/functions for cleaner and reusable code.
 
-    - ✅ ApiResponse: standardizes all successful API responses
-    - ❌ ApiError: provides structured, consistent error responses with HTTP status codes
-    - ⚙️ asyncHandler: a higher-order function that wraps all controller methods to catch async errors and forward them to the global error handler, eliminating repetitive try-catch blocks.
-
-- 📁 Well-defined Folder Structure using MVC pattern:
-
-    - controllers/, models/, routes/, middlewares/, utils/, etc.
+- **Utility-Driven Architecture**: Common logic is abstracted into reusable utility functions.  
+- **ApiResponse & ApiError**: Standardized success and error responses.  
+- **asyncHandler**: Wraps all controllers to catch async errors and forward to global error handler.  
+- **Dockerized Setup**: Containerized for easy build and deployment.  
+- **MVC Folder Structure**: Clean separation of controllers, models, routes, middlewares, and utils.
 
 ---
 
@@ -65,25 +66,26 @@ Designed with **clean code practices**, this backend is structured for **scalabi
 
 ```text
 StreamSync/
-├── docs/                    # Generated Swagger schema file (used by Swagger UI)
-├── public/temp/             # Temporary storage for uploaded files before processing or cleanup
-├── src/                      
-│   ├── controllers/         # Logic for each route (User, Video, Playlist)
-│   ├── models/              # Mongoose schemas (User.model.js, Video.model.js, etc.)
-│   ├── routes/              # All route definitions
-│   ├── middlewares/         # Auth, file uploading.
-│   ├── utils/               # Helper functions, API errors, response format
-│   ├── db/                  # Database connection (mongoose.connect)
-│   ├── index.js             # App entry point (server setup)
-│   ├── app.js               # Express app setup (middleware, routes)
-│   └── constants.js         # Global constants
-├── .env                     # Environment variables
-├── .gitignore               # Files/folders to ignore in Git
-├── .prettierignore          # Files to ignore from Prettier formatting
-├── .prettierrc              # Prettier configuration
-├── package.json             # Project dependencies & scripts
-├── package-lock.json        # Dependency lock file
-├── swagger.js               # Swagger configuration file
+├── docs/ # Swagger schema files for Swagger UI
+├── public/temp/ # Temporary storage for uploads
+├── src/
+│ ├── controllers/ # Route logic (User, Video, Playlist)
+│ ├── models/ # Mongoose schemas
+│ ├── routes/ # All route definitions
+│ ├── middlewares/ # Auth, file uploading, etc.
+│ ├── utils/ # Helper functions, API responses/errors
+│ ├── db/ # MongoDB connection
+│ ├── index.js # App entry point (server setup)
+│ ├── app.js # Express app setup
+│ └── constants.js # Global constants
+├── .env # Environment variables
+├── .gitignore # Git ignore rules
+├── .prettierrc / .prettierignore # Prettier config
+├── Dockerfile # Docker configuration
+├── .dockerignore # Docker ignore rules
+├── package.json # Project dependencies & scripts
+├── package-lock.json # Dependency lock
+└── swagger.js # Swagger configuration
 
 ```
 
@@ -91,7 +93,36 @@ This structure ensures:
 
 - ✅ Clean separation of concerns  
 - ✅ Easy debugging and testing  
-- ✅ Scalable codebase as the application grows
+- ✅ Scalable codebase
+- ✅ One-command setup with Docker  
+
+---
+## 🐳 Docker Setup
+
+StreamSync is fully containerized.  
+
+**Prerequisites:**  
+[Docker installed](https://docs.docker.com/get-docker/)
+
+**Run with Docker:**
+
+```bash
+# Clone the repository
+git clone https://github.com/your-username/StreamSync.git
+cd StreamSync
+
+# Create .env file
+cp .env.example .env
+# Fill in environment variables
+
+# Build Docker image
+docker build -t streamsync .
+
+# Run container
+docker run -p 8000:8000 --env-file .env streamsync
+```
+
+The app will be available at: http://localhost:8000
 
 ---
 
@@ -136,5 +167,6 @@ This structure ensures:
 | 📈 **Scalability**    | Modular folder structure, stateless APIs, and MongoDB’s performance with aggregation make the project ready for large-scale deployments. |
 | 🛡 **Security**       | Utilizes secure cookies, input validation, and route protection. |
 | 🔧 **Maintainability**| Easy to extend due to clean file separation, utility-based architecture, and reusable controllers/middlewares. |
+| 🐳 **Containerization**| Dockerized for consistent and portable deployment |
 
 ---
