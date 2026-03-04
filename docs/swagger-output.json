@@ -2,103 +2,126 @@
   "swagger": "2.0",
   "info": {
     "title": "StreamSync – Backend for Video Streaming Platform",
-    "description": "List of available API endpoints for the StreamSync — including authentication, video management, playlists, comments, reactions, subscriptions, and features like pagination and MongoDB aggregation pipelines.",
+    "description": "List of available API endpoints for StreamSync — including authentication, video management, playlists, comments, reactions, subscriptions, and features like pagination and MongoDB aggregation pipelines.",
     "version": "1.0.0"
   },
   "paths": {
+
     "/api/v1/healthcheck/": {
       "get": {
-        "description": "",
+        "summary": "Health Check",
+        "description": "Check if the server is up and running.",
         "responses": {
-          "200": {
-            "description": "OK"
-          }
+          "200": { "description": "Server is healthy" }
         }
       }
     },
+
     "/api/v1/users/register": {
       "post": {
-        "description": "",
+        "summary": "Register a new user",
+        "description": "Creates a new user account. Accepts avatar (required) and coverImage (optional) as file uploads along with user details.",
+        "consumes": ["multipart/form-data"],
         "parameters": [
           {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "fullName": {
-                  "example": "any"
-                },
-                "email": {
-                  "example": "any"
-                },
-                "username": {
-                  "example": "any"
-                },
-                "password": {
-                  "example": "any"
-                }
-              }
-            }
+            "name": "fullName",
+            "in": "formData",
+            "type": "string",
+            "required": true,
+            "example": "John Doe"
+          },
+          {
+            "name": "email",
+            "in": "formData",
+            "type": "string",
+            "required": true,
+            "example": "john@example.com"
+          },
+          {
+            "name": "username",
+            "in": "formData",
+            "type": "string",
+            "required": true,
+            "example": "johndoe"
+          },
+          {
+            "name": "password",
+            "in": "formData",
+            "type": "string",
+            "required": true,
+            "example": "secret123"
+          },
+          {
+            "name": "avatar",
+            "in": "formData",
+            "type": "file",
+            "required": true,
+            "description": "User profile picture (jpg, png, etc.)"
+          },
+          {
+            "name": "coverImage",
+            "in": "formData",
+            "type": "file",
+            "required": false,
+            "description": "User channel cover/banner image (optional)"
           }
         ],
         "responses": {
-          "201": {
-            "description": "Created"
-          }
+          "201": { "description": "User registered successfully" }
         }
       }
     },
+
     "/api/v1/users/login": {
       "post": {
-        "description": "",
+        "summary": "Login user",
+        "description": "Authenticates a user using email or username and password. Returns access and refresh tokens in HTTP-only cookies.",
+        "consumes": ["application/json"],
         "parameters": [
           {
             "name": "body",
             "in": "body",
+            "required": true,
             "schema": {
               "type": "object",
               "properties": {
-                "email": {
-                  "example": "any"
-                },
-                "username": {
-                  "example": "any"
-                },
-                "password": {
-                  "example": "any"
-                }
+                "email": { "type": "string", "example": "john@example.com" },
+                "username": { "type": "string", "example": "johndoe" },
+                "password": { "type": "string", "example": "secret123" }
               }
             }
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK"
-          }
+          "200": { "description": "Login successful. Tokens set in HTTP-only cookies." }
         }
       }
     },
+
     "/api/v1/users/logout": {
       "post": {
-        "description": "",
+        "summary": "Logout user",
+        "description": "Clears access and refresh token cookies. Requires authentication.",
         "parameters": [
           {
             "name": "Authorization",
             "in": "header",
-            "type": "string"
+            "type": "string",
+            "required": true,
+            "description": "Bearer <access_token>"
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK"
-          }
+          "200": { "description": "Logged out successfully" }
         }
       }
     },
+
     "/api/v1/users/refresh-token": {
       "post": {
-        "description": "",
+        "summary": "Refresh access token",
+        "description": "Issues a new access token using a valid refresh token. Token can be sent in body or cookie.",
+        "consumes": ["application/json"],
         "parameters": [
           {
             "name": "body",
@@ -106,236 +129,259 @@
             "schema": {
               "type": "object",
               "properties": {
-                "refreshToken": {
-                  "example": "any"
-                }
+                "refreshToken": { "type": "string", "example": "your_refresh_token_here" }
               }
             }
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK"
-          }
+          "200": { "description": "New access token issued" }
         }
       }
     },
+
     "/api/v1/users/change-password": {
       "post": {
-        "description": "",
+        "summary": "Change current user password",
+        "description": "Allows the logged-in user to update their password. Requires authentication.",
+        "consumes": ["application/json"],
         "parameters": [
           {
             "name": "Authorization",
             "in": "header",
-            "type": "string"
+            "type": "string",
+            "required": true,
+            "description": "Bearer <access_token>"
           },
           {
             "name": "body",
             "in": "body",
+            "required": true,
             "schema": {
               "type": "object",
               "properties": {
-                "password": {
-                  "example": "any"
-                },
-                "newPassword": {
-                  "example": "any"
-                }
+                "password": { "type": "string", "example": "oldPassword123" },
+                "newPassword": { "type": "string", "example": "newPassword456" }
               }
             }
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK"
-          }
+          "200": { "description": "Password changed successfully" }
         }
       }
     },
+
     "/api/v1/users/get-current-user": {
       "get": {
-        "description": "",
+        "summary": "Get current logged-in user",
+        "description": "Returns the profile data of the currently authenticated user. No request body needed.",
         "parameters": [
           {
             "name": "Authorization",
             "in": "header",
-            "type": "string"
+            "type": "string",
+            "required": true,
+            "description": "Bearer <access_token>"
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK"
-          }
+          "200": { "description": "Current user data returned" }
         }
       }
     },
+
     "/api/v1/users/update-details": {
       "patch": {
-        "description": "",
+        "summary": "Update user account details",
+        "description": "Updates fullName and/or email of the logged-in user.",
+        "consumes": ["application/json"],
         "parameters": [
           {
             "name": "Authorization",
             "in": "header",
-            "type": "string"
+            "type": "string",
+            "required": true,
+            "description": "Bearer <access_token>"
           },
           {
             "name": "body",
             "in": "body",
+            "required": true,
             "schema": {
               "type": "object",
               "properties": {
-                "fullName": {
-                  "example": "any"
-                },
-                "email": {
-                  "example": "any"
-                }
+                "fullName": { "type": "string", "example": "John Updated" },
+                "email": { "type": "string", "example": "updated@example.com" }
               }
             }
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK"
-          }
+          "200": { "description": "Account details updated successfully" }
         }
       }
     },
+
     "/api/v1/users/change-avatar": {
       "patch": {
-        "description": "",
+        "summary": "Update user avatar",
+        "description": "Replaces the current avatar with a new uploaded image. Old image is deleted from Cloudinary.",
+        "consumes": ["multipart/form-data"],
         "parameters": [
           {
             "name": "Authorization",
             "in": "header",
-            "type": "string"
+            "type": "string",
+            "required": true,
+            "description": "Bearer <access_token>"
+          },
+          {
+            "name": "avatar",
+            "in": "formData",
+            "type": "file",
+            "required": true,
+            "description": "New avatar image file (jpg, png, etc.)"
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK"
-          }
+          "200": { "description": "Avatar updated successfully" }
         }
       }
     },
+
     "/api/v1/users/update-cover-image": {
       "patch": {
-        "description": "",
+        "summary": "Update user cover image",
+        "description": "Replaces the current channel cover/banner image with a new uploaded image.",
+        "consumes": ["multipart/form-data"],
         "parameters": [
           {
             "name": "Authorization",
             "in": "header",
-            "type": "string"
+            "type": "string",
+            "required": true,
+            "description": "Bearer <access_token>"
+          },
+          {
+            "name": "coverImage",
+            "in": "formData",
+            "type": "file",
+            "required": true,
+            "description": "New cover image file (jpg, png, etc.)"
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK"
-          }
+          "200": { "description": "Cover image updated successfully" }
         }
       }
     },
+
     "/api/v1/users/c/{username}": {
       "get": {
-        "description": "",
+        "summary": "Get channel profile by username",
+        "description": "Returns public channel profile including subscriber count, video count, and subscription status.",
         "parameters": [
           {
             "name": "username",
             "in": "path",
             "required": true,
-            "type": "string"
+            "type": "string",
+            "example": "johndoe"
           },
           {
             "name": "Authorization",
             "in": "header",
-            "type": "string"
+            "type": "string",
+            "required": true,
+            "description": "Bearer <access_token>"
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK"
-          }
+          "200": { "description": "Channel profile returned" }
         }
       }
     },
+
     "/api/v1/users/history": {
       "get": {
-        "description": "",
+        "summary": "Get watch history",
+        "description": "Returns the list of videos watched by the currently logged-in user.",
         "parameters": [
           {
             "name": "Authorization",
             "in": "header",
-            "type": "string"
+            "type": "string",
+            "required": true,
+            "description": "Bearer <access_token>"
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK"
-          }
+          "200": { "description": "Watch history returned" }
         }
       }
     },
+
     "/api/v1/tweets/": {
       "post": {
-        "description": "",
+        "summary": "Create a tweet",
+        "description": "Creates a new tweet for the logged-in user.",
+        "consumes": ["application/json"],
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "type": "string",
+            "required": true,
+            "description": "Bearer <access_token>"
+          },
           {
             "name": "body",
             "in": "body",
+            "required": true,
             "schema": {
               "type": "object",
               "properties": {
-                "content": {
-                  "example": "any"
-                }
+                "content": { "type": "string", "example": "This is my tweet!" }
               }
             }
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK"
-          }
+          "200": { "description": "Tweet created successfully" }
         }
       }
     },
+
     "/api/v1/tweets/user/{userId}": {
       "get": {
-        "description": "",
+        "summary": "Get all tweets by a user",
         "parameters": [
           {
             "name": "userId",
             "in": "path",
             "required": true,
-            "type": "string"
+            "type": "string",
+            "example": "64a7c2f5e4b0a12345678901"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "type": "string",
+            "required": true,
+            "description": "Bearer <access_token>"
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK"
-          }
+          "200": { "description": "List of user tweets returned" }
         }
       }
     },
+
     "/api/v1/tweets/{tweetId}": {
-      "delete": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "tweetId",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      },
       "patch": {
-        "description": "",
+        "summary": "Update a tweet",
+        "consumes": ["application/json"],
         "parameters": [
           {
             "name": "tweetId",
@@ -344,179 +390,257 @@
             "type": "string"
           },
           {
+            "name": "Authorization",
+            "in": "header",
+            "type": "string",
+            "required": true,
+            "description": "Bearer <access_token>"
+          },
+          {
             "name": "body",
             "in": "body",
+            "required": true,
             "schema": {
               "type": "object",
               "properties": {
-                "content": {
-                  "example": "any"
-                }
+                "content": { "type": "string", "example": "Updated tweet content" }
               }
             }
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK"
+          "200": { "description": "Tweet updated" }
+        }
+      },
+      "delete": {
+        "summary": "Delete a tweet",
+        "parameters": [
+          {
+            "name": "tweetId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "type": "string",
+            "required": true,
+            "description": "Bearer <access_token>"
           }
+        ],
+        "responses": {
+          "200": { "description": "Tweet deleted" }
         }
       }
     },
+
     "/api/v1/subscriptions/c/{channelId}": {
       "get": {
-        "description": "",
+        "summary": "Get subscribers of a channel",
+        "description": "Returns list of users subscribed to the given channel.",
         "parameters": [
           {
             "name": "channelId",
             "in": "path",
             "required": true,
-            "type": "string"
+            "type": "string",
+            "example": "64a7c2f5e4b0a12345678901"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "type": "string",
+            "required": true,
+            "description": "Bearer <access_token>"
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK"
-          }
+          "200": { "description": "Subscriber list returned" }
         }
       },
       "post": {
-        "description": "",
+        "summary": "Toggle subscription to a channel",
+        "description": "Subscribes to the channel if not subscribed, unsubscribes if already subscribed.",
         "parameters": [
           {
             "name": "channelId",
             "in": "path",
             "required": true,
-            "type": "string"
+            "type": "string",
+            "example": "64a7c2f5e4b0a12345678901"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "type": "string",
+            "required": true,
+            "description": "Bearer <access_token>"
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK"
-          }
+          "200": { "description": "Subscription toggled" }
         }
       }
     },
+
     "/api/v1/subscriptions/u/{subscriberId}": {
       "get": {
-        "description": "",
+        "summary": "Get channels subscribed to by a user",
         "parameters": [
           {
             "name": "subscriberId",
             "in": "path",
             "required": true,
-            "type": "string"
+            "type": "string",
+            "example": "64a7c2f5e4b0a12345678901"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "type": "string",
+            "required": true,
+            "description": "Bearer <access_token>"
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK"
-          }
+          "200": { "description": "Subscribed channels list returned" }
         }
       }
     },
+
     "/api/v1/videos/": {
       "get": {
-        "description": "",
+        "summary": "Get all videos (paginated, searchable)",
+        "description": "Fetches a paginated list of videos. Supports search query, sorting, and filtering by user.",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "type": "string",
+            "required": true,
+            "description": "Bearer <access_token>"
+          },
           {
             "name": "page",
             "in": "query",
-            "type": "string"
+            "type": "string",
+            "example": "1"
           },
           {
             "name": "limit",
             "in": "query",
-            "type": "string"
+            "type": "string",
+            "example": "10"
           },
           {
             "name": "query",
             "in": "query",
-            "type": "string"
+            "type": "string",
+            "description": "Search keyword for video title or description",
+            "example": "node.js tutorial"
           },
           {
             "name": "sortBy",
             "in": "query",
-            "type": "string"
+            "type": "string",
+            "description": "Field to sort by",
+            "example": "createdAt"
           },
           {
             "name": "sortType",
             "in": "query",
-            "type": "string"
+            "type": "string",
+            "description": "Sort direction: asc or desc",
+            "example": "desc"
           },
           {
             "name": "userId",
             "in": "query",
-            "type": "string"
+            "type": "string",
+            "description": "Filter videos by a specific user",
+            "example": "64a7c2f5e4b0a12345678901"
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK"
-          }
+          "200": { "description": "Paginated video list returned" }
         }
       },
       "post": {
-        "description": "",
+        "summary": "Upload / publish a new video",
+        "description": "Uploads a video file and thumbnail to Cloudinary and creates the video document.",
+        "consumes": ["multipart/form-data"],
         "parameters": [
           {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "title": {
-                  "example": "any"
-                },
-                "description": {
-                  "example": "any"
-                }
-              }
-            }
+            "name": "Authorization",
+            "in": "header",
+            "type": "string",
+            "required": true,
+            "description": "Bearer <access_token>"
+          },
+          {
+            "name": "videoFile",
+            "in": "formData",
+            "type": "file",
+            "required": true,
+            "description": "The video file to upload (mp4, mkv, etc.)"
+          },
+          {
+            "name": "thumbnail",
+            "in": "formData",
+            "type": "file",
+            "required": true,
+            "description": "Thumbnail image for the video (jpg, png, etc.)"
+          },
+          {
+            "name": "title",
+            "in": "formData",
+            "type": "string",
+            "required": true,
+            "example": "My First Video"
+          },
+          {
+            "name": "description",
+            "in": "formData",
+            "type": "string",
+            "required": false,
+            "example": "This video is about..."
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK"
-          }
+          "200": { "description": "Video published successfully" }
         }
       }
     },
+
     "/api/v1/videos/{videoId}": {
       "get": {
-        "description": "",
+        "summary": "Get a video by ID",
+        "description": "Returns full video details. Also adds the video to the user's watch history.",
         "parameters": [
           {
             "name": "videoId",
             "in": "path",
             "required": true,
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      },
-      "delete": {
-        "description": "",
-        "parameters": [
+            "type": "string",
+            "example": "64a7c2f5e4b0a12345678902"
+          },
           {
-            "name": "videoId",
-            "in": "path",
+            "name": "Authorization",
+            "in": "header",
+            "type": "string",
             "required": true,
-            "type": "string"
+            "description": "Bearer <access_token>"
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK"
-          }
+          "200": { "description": "Video details returned" }
         }
       },
       "patch": {
-        "description": "",
+        "summary": "Update video details or thumbnail",
+        "description": "Updates title, description, or thumbnail of an existing video. Only thumbnail uses file upload.",
+        "consumes": ["multipart/form-data"],
         "parameters": [
           {
             "name": "videoId",
@@ -525,75 +649,124 @@
             "type": "string"
           },
           {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "title": {
-                  "example": "any"
-                },
-                "description": {
-                  "example": "any"
-                }
-              }
-            }
+            "name": "Authorization",
+            "in": "header",
+            "type": "string",
+            "required": true,
+            "description": "Bearer <access_token>"
+          },
+          {
+            "name": "thumbnail",
+            "in": "formData",
+            "type": "file",
+            "required": false,
+            "description": "New thumbnail image (optional)"
+          },
+          {
+            "name": "title",
+            "in": "formData",
+            "type": "string",
+            "required": false,
+            "example": "Updated Video Title"
+          },
+          {
+            "name": "description",
+            "in": "formData",
+            "type": "string",
+            "required": false,
+            "example": "Updated description"
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK"
+          "200": { "description": "Video updated successfully" }
+        }
+      },
+      "delete": {
+        "summary": "Delete a video",
+        "description": "Deletes the video and its associated files from Cloudinary.",
+        "parameters": [
+          {
+            "name": "videoId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "type": "string",
+            "required": true,
+            "description": "Bearer <access_token>"
           }
+        ],
+        "responses": {
+          "200": { "description": "Video deleted successfully" }
         }
       }
     },
+
     "/api/v1/videos/toggle/publish/{videoId}": {
       "patch": {
-        "description": "",
+        "summary": "Toggle video publish status",
+        "description": "Switches a video between published and unpublished state.",
         "parameters": [
           {
             "name": "videoId",
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "type": "string",
+            "required": true,
+            "description": "Bearer <access_token>"
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK"
-          }
+          "200": { "description": "Publish status toggled" }
         }
       }
     },
+
     "/api/v1/comments/{videoId}": {
       "get": {
-        "description": "",
+        "summary": "Get all comments for a video (paginated)",
         "parameters": [
           {
             "name": "videoId",
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "type": "string",
+            "required": true,
+            "description": "Bearer <access_token>"
           },
           {
             "name": "page",
             "in": "query",
-            "type": "string"
+            "type": "string",
+            "example": "1"
           },
           {
             "name": "limit",
             "in": "query",
-            "type": "string"
+            "type": "string",
+            "example": "10"
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK"
-          }
+          "200": { "description": "Paginated comments returned" }
         }
       },
       "post": {
-        "description": "",
+        "summary": "Add a comment to a video",
+        "consumes": ["application/json"],
         "parameters": [
           {
             "name": "videoId",
@@ -602,44 +775,34 @@
             "type": "string"
           },
           {
+            "name": "Authorization",
+            "in": "header",
+            "type": "string",
+            "required": true,
+            "description": "Bearer <access_token>"
+          },
+          {
             "name": "body",
             "in": "body",
+            "required": true,
             "schema": {
               "type": "object",
               "properties": {
-                "content": {
-                  "example": "any"
-                }
+                "content": { "type": "string", "example": "Great video!" }
               }
             }
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK"
-          }
+          "200": { "description": "Comment added" }
         }
       }
     },
+
     "/api/v1/comments/c/{commentId}": {
-      "delete": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "commentId",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      },
       "patch": {
-        "description": "",
+        "summary": "Update a comment",
+        "consumes": ["application/json"],
         "parameters": [
           {
             "name": "commentId",
@@ -648,191 +811,279 @@
             "type": "string"
           },
           {
+            "name": "Authorization",
+            "in": "header",
+            "type": "string",
+            "required": true,
+            "description": "Bearer <access_token>"
+          },
+          {
             "name": "body",
             "in": "body",
+            "required": true,
             "schema": {
               "type": "object",
               "properties": {
-                "content": {
-                  "example": "any"
-                }
+                "content": { "type": "string", "example": "Updated comment text" }
               }
             }
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK"
+          "200": { "description": "Comment updated" }
+        }
+      },
+      "delete": {
+        "summary": "Delete a comment",
+        "parameters": [
+          {
+            "name": "commentId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "type": "string",
+            "required": true,
+            "description": "Bearer <access_token>"
           }
+        ],
+        "responses": {
+          "200": { "description": "Comment deleted" }
         }
       }
     },
+
     "/api/v1/likes/toggle/v/{videoId}": {
       "post": {
-        "description": "",
+        "summary": "Toggle like on a video",
+        "description": "Likes the video if not liked, removes like if already liked.",
         "parameters": [
           {
             "name": "videoId",
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "type": "string",
+            "required": true,
+            "description": "Bearer <access_token>"
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK"
-          }
+          "200": { "description": "Like toggled on video" }
         }
       }
     },
+
     "/api/v1/likes/toggle/c/{commentId}": {
       "post": {
-        "description": "",
+        "summary": "Toggle like on a comment",
         "parameters": [
           {
             "name": "commentId",
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "type": "string",
+            "required": true,
+            "description": "Bearer <access_token>"
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK"
-          }
+          "200": { "description": "Like toggled on comment" }
         }
       }
     },
+
     "/api/v1/likes/toggle/t/{tweetId}": {
       "post": {
-        "description": "",
+        "summary": "Toggle like on a tweet",
         "parameters": [
           {
             "name": "tweetId",
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "type": "string",
+            "required": true,
+            "description": "Bearer <access_token>"
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK"
-          }
+          "200": { "description": "Like toggled on tweet" }
         }
       }
     },
+
     "/api/v1/likes/liked-videos": {
       "get": {
-        "description": "",
+        "summary": "Get all liked videos by current user (paginated)",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "type": "string",
+            "required": true,
+            "description": "Bearer <access_token>"
+          },
           {
             "name": "page",
             "in": "query",
-            "type": "string"
+            "type": "string",
+            "example": "1"
           },
           {
             "name": "limit",
             "in": "query",
-            "type": "string"
+            "type": "string",
+            "example": "10"
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK"
-          }
+          "200": { "description": "Liked videos list returned" }
         }
       }
     },
+
     "/api/v1/playlist/": {
       "post": {
-        "description": "",
+        "summary": "Create a new playlist",
+        "consumes": ["application/json"],
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "type": "string",
+            "required": true,
+            "description": "Bearer <access_token>"
+          },
           {
             "name": "body",
             "in": "body",
+            "required": true,
             "schema": {
               "type": "object",
               "properties": {
-                "name": {
-                  "example": "any"
-                },
-                "description": {
-                  "example": "any"
-                }
+                "name": { "type": "string", "example": "My Favourites" },
+                "description": { "type": "string", "example": "Videos I love" }
               }
             }
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK"
-          }
+          "200": { "description": "Playlist created" }
         }
       }
     },
+
     "/api/v1/playlist/{playlistId}": {
       "get": {
-        "description": "",
+        "summary": "Get a playlist by ID (paginated)",
         "parameters": [
           {
             "name": "playlistId",
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "type": "string",
+            "required": true,
+            "description": "Bearer <access_token>"
           },
           {
             "name": "page",
             "in": "query",
-            "type": "string"
+            "type": "string",
+            "example": "1"
           },
           {
             "name": "limit",
             "in": "query",
-            "type": "string"
+            "type": "string",
+            "example": "10"
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK"
+          "200": { "description": "Playlist details returned" }
+        }
+      },
+      "patch": {
+        "summary": "Update playlist name or description",
+        "consumes": ["application/json"],
+        "parameters": [
+          {
+            "name": "playlistId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "type": "string",
+            "required": true,
+            "description": "Bearer <access_token>"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": { "type": "string", "example": "Updated Playlist Name" },
+                "description": { "type": "string", "example": "Updated description" }
+              }
+            }
           }
+        ],
+        "responses": {
+          "200": { "description": "Playlist updated" }
         }
       },
       "delete": {
-        "description": "",
+        "summary": "Delete a playlist",
         "parameters": [
           {
             "name": "playlistId",
             "in": "path",
             "required": true,
             "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      },
-      "patch": {
-        "description": "",
-        "parameters": [
+          },
           {
-            "name": "playlistId",
-            "in": "path",
+            "name": "Authorization",
+            "in": "header",
+            "type": "string",
             "required": true,
-            "type": "string"
+            "description": "Bearer <access_token>"
           }
         ],
         "responses": {
-          "default": {
-            "description": ""
-          }
+          "200": { "description": "Playlist deleted" }
         }
       }
     },
+
     "/api/v1/playlist/add/{videoId}/{playlistId}": {
       "patch": {
-        "description": "",
+        "summary": "Add a video to a playlist",
         "parameters": [
           {
             "name": "videoId",
@@ -845,18 +1096,24 @@
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "type": "string",
+            "required": true,
+            "description": "Bearer <access_token>"
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK"
-          }
+          "200": { "description": "Video added to playlist" }
         }
       }
     },
+
     "/api/v1/playlist/remove/{videoId}/{playlistId}": {
       "patch": {
-        "description": "",
+        "summary": "Remove a video from a playlist",
         "parameters": [
           {
             "name": "videoId",
@@ -869,64 +1126,93 @@
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "type": "string",
+            "required": true,
+            "description": "Bearer <access_token>"
           }
         ],
         "responses": {
-          "default": {
-            "description": ""
-          }
+          "200": { "description": "Video removed from playlist" }
         }
       }
     },
+
     "/api/v1/playlist/user/{userId}": {
       "get": {
-        "description": "",
+        "summary": "Get all playlists of a user",
         "parameters": [
           {
             "name": "userId",
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "type": "string",
+            "required": true,
+            "description": "Bearer <access_token>"
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK"
-          }
+          "200": { "description": "User playlists returned" }
         }
       }
     },
+
     "/api/v1/dashboard/stats": {
       "get": {
-        "description": "",
-        "responses": {
-          "200": {
-            "description": "OK"
+        "summary": "Get channel dashboard stats",
+        "description": "Returns aggregated stats for the logged-in channel: total videos, views, subscribers, and likes.",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "type": "string",
+            "required": true,
+            "description": "Bearer <access_token>"
           }
+        ],
+        "responses": {
+          "200": { "description": "Dashboard stats returned" }
         }
       }
     },
+
     "/api/v1/dashboard/videos": {
       "get": {
-        "description": "",
+        "summary": "Get all videos for channel dashboard (paginated)",
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "type": "string",
+            "required": true,
+            "description": "Bearer <access_token>"
+          },
           {
             "name": "page",
             "in": "query",
-            "type": "string"
+            "type": "string",
+            "example": "1"
           },
           {
             "name": "limit",
             "in": "query",
-            "type": "string"
+            "type": "string",
+            "example": "10"
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK"
-          }
+          "200": { "description": "Paginated channel videos returned" }
         }
       }
     }
+
   }
 }
